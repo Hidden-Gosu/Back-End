@@ -10,4 +10,5 @@ public class SoomgoApplication {
         SpringApplication.run(SoomgoApplication.class, args);
     }
 
+
 }
