@@ -9,14 +9,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 
-@Getter
-@RequiredArgsConstructor
 public class UserDto {
 
     @Getter
-    @Builder
+    @Setter
     @ToString
-    public  class RegisterUserRequest{
+    public static class RegisterUserRequest{
 
         @NotBlank(message = "이름은 필수항목입니다.")
         @Length(min = 2,max = 7,message = "이름은 2~7자리 입니다.")
@@ -28,9 +26,8 @@ public class UserDto {
         @Email(message = "email 형식에 맞아야 합니다")
         private String email;
 
-        @Builder
-        public UserCommand toCommand(){
 
+        public UserCommand toCommand(){
             return UserCommand.builder()
                     .username(username)
                     .password(password)

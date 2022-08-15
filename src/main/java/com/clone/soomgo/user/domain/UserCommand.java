@@ -3,12 +3,14 @@ package com.clone.soomgo.user.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Getter
 @RequiredArgsConstructor
 @Builder
+@ToString
 public class UserCommand {
 
     private final PasswordEncoder passwordEncoder;
