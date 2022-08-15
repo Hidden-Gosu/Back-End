@@ -1,5 +1,9 @@
 package com.clone.soomgo.comm.converter;
 
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+@Converter
 public class BooleanToYNConverter implements AttributeConverter<Boolean,String> {
 
 
