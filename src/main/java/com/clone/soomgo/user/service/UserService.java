@@ -1,4 +1,9 @@
 package com.clone.soomgo.user.service;
 
-public class UserService {
+import com.clone.soomgo.user.domain.UserCommand;
+import com.clone.soomgo.user.dto.UserDto;
+
+public interface UserService {
+
+    void RegisterClient(UserCommand request);
 }
