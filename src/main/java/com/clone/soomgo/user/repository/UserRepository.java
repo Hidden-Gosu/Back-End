@@ -1,6 +1,6 @@
 package com.clone.soomgo.user.repository;
 
-import com.clone.soomgo.user.model.User;
+import com.clone.soomgo.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

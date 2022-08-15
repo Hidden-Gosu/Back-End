@@ -16,8 +16,8 @@ import static com.clone.soomgo.security.jwt.JwtTokenUtils.*;
 @Component
 public class JwtDecoder {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public String decodeUsername(String token) {
         DecodedJWT decodedJWT = isValidToken(token)
@@ -39,7 +39,6 @@ public class JwtDecoder {
         return username;
     }
 
-
     private Optional<DecodedJWT> isValidToken(String token) {
         DecodedJWT jwt = null;
 
@@ -57,3 +56,4 @@ public class JwtDecoder {
         return Optional.ofNullable(jwt);
     }
 }
+

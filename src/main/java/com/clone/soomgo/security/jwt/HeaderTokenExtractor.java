@@ -1,11 +1,13 @@
 package com.clone.soomgo.security.jwt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.NoSuchElementException;
 
 @Component
+@Slf4j
 public class HeaderTokenExtractor {
 
     /*
@@ -15,6 +17,7 @@ public class HeaderTokenExtractor {
     public final String HEADER_PREFIX = "Bearer ";
 
     public String extract(String header, HttpServletRequest request) {
+        log.info("extract ={}",header);
         /*
          * - Token 값이 올바르지 않은경우 -
          * header 값이 비어있거나 또는 HEADER_PREFIX 값보다 짧은 경우

@@ -1,17 +1,12 @@
 package com.clone.soomgo.security;
 
-import com.clone.soomgo.user.model.User;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import com.clone.soomgo.user.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@Getter
-@Slf4j
 public class UserDetailsImpl implements UserDetails {
-
 
     private final User user;
 
@@ -32,7 +27,6 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return user.getUsername();
     }
-    public Long getUserId() {return user.getUserId();}
 
     @Override
     public boolean isAccountNonExpired() {

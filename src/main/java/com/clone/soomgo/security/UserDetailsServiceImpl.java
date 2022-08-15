@@ -1,7 +1,6 @@
 package com.clone.soomgo.security;
 
-
-import com.clone.soomgo.user.model.User;
+import com.clone.soomgo.user.domain.User;
 import com.clone.soomgo.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Can't find " + username));
-            return new UserDetailsImpl(user);
 
+        return new UserDetailsImpl(user);
     }
 }

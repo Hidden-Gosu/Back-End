@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,8 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -42,9 +39,16 @@ public class WebSecurityConfig{
     }
     //antMatchers에 파라미터로 넘겨주는 endpoints는 Spring Security Filter Chain을 거치지 않기 때문에
     // '인증' , '인가' 서비스가 모두 적용되지 않는다.
+
+    @Bean
+    public FormLoginAuthProvider formLoginAuthProvider() {
+        return new FormLoginAuthProvider(encodePassword());
+    }
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring().antMatchers("/h2-console/**");
+        return (web) -> web.ignoring()
+                .antMatchers("/h2-console/**");
     }
     // 1. WebSecurityConfigurerAdapter는 이제 사용하지 않음
     // 2. FilterChain을 빈으로 등록하여 사용
@@ -55,38 +59,38 @@ public class WebSecurityConfig{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        /*
-         * 1.
-         * UsernamePasswordAuthenticationFilter 이전에 FormLoginFilter, JwtFilter 를 등록합니다.
-         * FormLoginFilter : 로그인 인증을 실시합니다.
-         * JwtFilter       : 서버에 접근시 JWT 확인 후 인증을 실시합니다.
-         */
         http
                 .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter(),UsernamePasswordAuthenticationFilter.class);
 
         http
-                .authorizeRequests((authz) -> authz
-                        .anyRequest()
-                        .permitAll()
+                .authorizeRequests((authz) -> {
+                            try {
+                                authz
+                                        .anyRequest()
+                                        .permitAll()
+                                        .and()
+                                        .logout()
+                                        .logoutUrl("/user/logout")
+                                        .and()
+                                        .exceptionHandling();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                 );
+        http
+                .authenticationProvider(formLoginAuthProvider())
+                .authenticationProvider(jwtAuthProvider);
     return http.build();
     }
 
-    //=======================================================
-    @Bean
-    public void configure(AuthenticationManagerBuilder auth){
-        auth
-                .authenticationProvider(formLoginAuthProvider())
-                .authenticationProvider(jwtAuthProvider);
-    }
-    //========================================================
 
     @Bean
     public FormLoginFilter formLoginFilter() throws Exception {
-        FormLoginFilter formLoginFilter = new FormLoginFilter(authenticationManager(authenticationConfiguration));
-        formLoginFilter.setFilterProcessesUrl("/user/login");
+        FormLoginFilter formLoginFilter = new FormLoginFilter(authenticationManager());
+        formLoginFilter.setFilterProcessesUrl("/users/login");
         formLoginFilter.setAuthenticationSuccessHandler(formLoginSuccessHandler());
         formLoginFilter.afterPropertiesSet();
         return formLoginFilter;
@@ -97,10 +101,6 @@ public class WebSecurityConfig{
         return new FormLoginSuccessHandler();
     }
 
-    @Bean
-    public FormLoginAuthProvider formLoginAuthProvider() {
-        return new FormLoginAuthProvider(encodePassword());
-    }
 
     private JwtAuthFilter jwtFilter() throws Exception {
         List<String> skipPathList = new ArrayList<>();
@@ -111,8 +111,8 @@ public class WebSecurityConfig{
         skipPathList.add("GET,/h2-console/**");
         skipPathList.add("POST,/h2-console/**");
         // 회원 관리 API 허용
-        skipPathList.add("GET,/user/**");
-        skipPathList.add("POST,/user/signup");
+        skipPathList.add("GET,/users/**");
+        skipPathList.add("POST,/users/client");
 
         FilterSkipMatcher matcher = new FilterSkipMatcher(
                 skipPathList,
@@ -123,13 +123,17 @@ public class WebSecurityConfig{
                 matcher,
                 headerTokenExtractor
         );
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+
+        filter.setAuthenticationManager(authenticationManager());
 
         return filter;
     }
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+
+
 
 }

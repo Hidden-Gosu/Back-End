@@ -2,6 +2,10 @@ package com.clone.soomgo.security.filter;
 
 import com.clone.soomgo.security.jwt.HeaderTokenExtractor;
 import com.clone.soomgo.security.jwt.JwtPreProcessingToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,11 +18,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Token 을 내려주는 Filter 가 아닌  client 에서 받아지는 Token 을 서버 사이드에서 검증하는 클레스 SecurityContextHolder 보관소에 해당
  * Token 값의 인증 상태를 보관 하고 필요할때 마다 인증 확인 후 권한 상태 확인 하는 기능
  */
+@Slf4j
 public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     private final HeaderTokenExtractor extractor;
@@ -40,9 +47,9 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
         // JWT 값을 담아주는 변수 TokenPayload
         String tokenPayload = request.getHeader("Authorization");
+        log.info("Authorization = {}",tokenPayload);
         if (tokenPayload == null) {
-//            response.sendRedirect("/auth/logIn");
-            response.sendError(494, "로그인이 필요한 서비스입니다.");
+            response.sendRedirect("/user/loginView");
             return null;
         }
 
@@ -90,10 +97,22 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
          */
         SecurityContextHolder.clearContext();
 
+        log.error("unsuccessfulAuthentication failed.getLocalizedMessage(): {}", failed.getLocalizedMessage());
+
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("code", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", failed.getMessage());
+
         super.unsuccessfulAuthentication(
                 request,
                 response,
                 failed
         );
+
+
+        new ObjectMapper().writeValue(response.getOutputStream(), body);
     }
 }
