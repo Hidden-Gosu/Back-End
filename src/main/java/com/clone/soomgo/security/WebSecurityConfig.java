@@ -111,8 +111,8 @@ public class WebSecurityConfig{
         skipPathList.add("GET,/h2-console/**");
         skipPathList.add("POST,/h2-console/**");
         // 회원 관리 API 허용
-        skipPathList.add("GET,/users/**");
-        skipPathList.add("POST,/users/client");
+        skipPathList.add("GET,/api/v1/users/**");
+        skipPathList.add("POST,/api/v1/users/**");
 
         FilterSkipMatcher matcher = new FilterSkipMatcher(
                 skipPathList,

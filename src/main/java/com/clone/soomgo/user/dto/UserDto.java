@@ -4,18 +4,20 @@ package com.clone.soomgo.user.dto;
 import com.clone.soomgo.user.domain.UserCommand;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 
+
 public class UserDto {
+
 
     @Getter
     @Setter
     @ToString
     public static class RegisterUserRequest{
-
         @NotBlank(message = "이름은 필수항목입니다.")
         @Length(min = 2,max = 7,message = "이름은 2~7자리 입니다.")
         private String username;

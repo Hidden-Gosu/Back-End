@@ -5,6 +5,8 @@ import com.clone.soomgo.user.domain.User;
 import com.clone.soomgo.user.dto.UserDto;
 import com.clone.soomgo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,16 +15,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
     public void RegisterClient(UserCommand request) {
         String username = request.getUsername();
         Optional<User> found = userRepository.findByUsername(username);
-        if(found.isPresent()){
+        if(found.isPresent()) {
             throw new IllegalArgumentException("중복된 사용자 ID가 존재합니다.");
         }
         User user = request.toEntity();

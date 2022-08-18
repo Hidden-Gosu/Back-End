@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+
 public class User {
 
     private static final String PREFIX_USER = "user_";
@@ -70,11 +70,6 @@ public class User {
         this.currentStatus = CurrentStatus.CLIENT;
     }
 
-//    public User(
-//        String username, String password
-//    ){
-//
-//    }
 
 
     public void changeCurrClient(){
